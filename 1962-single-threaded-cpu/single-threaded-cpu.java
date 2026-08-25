@@ -1,60 +1,50 @@
-//import java.util.*;
-
 class Solution {
     public int[] getOrder(int[][] tasks) {
 
         int n = tasks.length;
 
-        int[][] arr = new int[n][3];
+        Integer[] index = new Integer[n];
 
         for (int i = 0; i < n; i++) {
-            arr[i][0] = tasks[i][0];
-            arr[i][1] = tasks[i][1];
-            arr[i][2] = i;
+            index[i] = i;
         }
 
-        Arrays.sort(arr, (a, b) -> Integer.compare(a[0], b[0]));
+        Arrays.sort(index, (a, b) -> 
+            Integer.compare(tasks[a][0], tasks[b][0])
+        );
 
-    
-        PriorityQueue<int[]> pq = new PriorityQueue<>(
+        PriorityQueue<Integer> pq = new PriorityQueue<>(
             (a, b) -> {
-                if (a[1] != b[1]) {
-                    return Integer.compare(a[1], b[1]);
+                if (tasks[a][1] != tasks[b][1]) {
+                    return Integer.compare(tasks[a][1], tasks[b][1]);
                 }
-                return Integer.compare(a[2], b[2]);
+                return Integer.compare(a, b);
             }
         );
 
-        int[] result = new int[n];
+        int[] ans = new int[n];
 
         long time = 0;
         int i = 0;
-        int count = 0;
+        int k = 0;
 
-        while (count < n) {
+        while (k < n) {
 
-            
-            if (pq.isEmpty() && time < arr[i][0]) {
-                time = arr[i][0];
+            if (pq.isEmpty()) {
+                time = Math.max(time, tasks[index[i]][0]);
             }
 
-            
-            while (i < n && arr[i][0] <= time) {
-                pq.offer(arr[i]);
+            while (i < n && tasks[index[i]][0] <= time) {
+                pq.offer(index[i]);
                 i++;
             }
 
-          
-            int[] current = pq.poll();
+            int task = pq.poll();
 
-            
-            result[count] = current[2];
-            count++;
-
-            
-            time += current[1];
+            ans[k++] = task;
+            time += tasks[task][1];
         }
 
-        return result;
+        return ans;
     }
 }
