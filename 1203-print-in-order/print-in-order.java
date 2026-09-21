@@ -1,31 +1,39 @@
 class Foo {
+    private Object lock;
     private boolean oneDone;
     private boolean twoDone;
     
     public Foo() {
+        lock = new Object();
         oneDone = false;
         twoDone = false;
     }
 
-    public synchronized void first(Runnable printFirst) throws InterruptedException {
-        printFirst.run();
-        oneDone = true;
-        notifyAll();
+    public void first(Runnable printFirst) throws InterruptedException {
+        synchronized (lock) {
+            printFirst.run();
+            oneDone = true;
+            lock.notifyAll();
+        }
     }
 
-    public synchronized void second(Runnable printSecond) throws InterruptedException {
-        while (!oneDone) {
-            wait();
+    public void second(Runnable printSecond) throws InterruptedException {
+        synchronized (lock) {
+            while (!oneDone) {
+                lock.wait();
+            }
+            printSecond.run();
+            twoDone = true;
+            lock.notifyAll();
         }
-        printSecond.run();
-        twoDone = true;
-        notifyAll();
     }
 
-    public synchronized void third(Runnable printThird) throws InterruptedException {
-        while (!twoDone) {
-            wait();
+    public void third(Runnable printThird) throws InterruptedException {
+        synchronized (lock) {
+            while (!twoDone) {
+                lock.wait();
+            }
+            printThird.run();
         }
-        printThird.run();
     }
 }
