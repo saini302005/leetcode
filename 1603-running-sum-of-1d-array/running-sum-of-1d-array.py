@@ -8,7 +8,6 @@ class Solution(object):
             result.append(total)
 
         return result
-
         """
         :type nums: List[int]
         :rtype: List[int]
